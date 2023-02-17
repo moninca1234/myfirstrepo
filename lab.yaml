@@ -1,0 +1,48 @@
+Resources:  
+  VPC: 
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: 192.168.101.0/24
+  PublicSubnetA: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: "ap-south-1a" 
+      CidrBlock: 192.168.101.0/28
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
+  PrivateSubnetB: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: "ap-south-1b"
+      CidrBlock: 192.168.101.32/28
+      MapPublicIpOnLaunch: false
+      VpcId: !Ref VPC
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http  and SSH 
+      VpcId:!Ref VPC
+      SecurityGroupIngress:
+       - IpProtocol: tcp
+         FromPort: 80
+         ToPort: 80
+         CidrIp: 0.0.0.0/0
+       - IpProtocol: tcp
+         FromPort: 22
+         ToPort: 22
+         CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+       - IpProtocol: tcp
+         FromPort: 0
+         ToPort: 65535
+         CidrIp: 0.0.0.0/0
+  EC2Instance:  
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0e742cca61fb65051
+      KeyName: "monica_key"
+      SecurityGroupIds: 
+       -!Ref SecurityGroup
+      SubnetId:!Ref PublicSubnetA
+  
